@@ -24,8 +24,8 @@ namespace snake {
 
     struct Game {
     public:
-        static const int WIDTH = 10;
-        static const int HEIGHT = 10;
+        static const int WIDTH = 20;
+        static const int HEIGHT = 20;
 
         Game();
 
@@ -45,11 +45,11 @@ namespace snake {
 
         direction get_direction();
 
-        bool check_win();
+        bool check_is_ended();
 
-        int get_score() const;
+        [[nodiscard]] int get_score() const;
 
-        int get_snake_size() const;
+        [[nodiscard]] int get_snake_size() const;
 
     private:
         bool ended;
