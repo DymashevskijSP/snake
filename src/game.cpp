@@ -1,5 +1,6 @@
 #include"game.h"
 #include <cstdlib>
+
 namespace snake {
     namespace {
         bool not_opposite(snake::direction first_dir, snake::direction second_dir) {
@@ -53,6 +54,7 @@ namespace snake {
     void snake_part::set_direction(direction new_direction) {
         block_direction = new_direction;
     }
+
     Game::Game() : field(std::vector<std::vector<cell>>(
             snake::Game::HEIGHT, std::vector<cell>(snake::Game::WIDTH, cell::EMPTY))),
                    snake({{snake::direction::NONE,
@@ -60,7 +62,7 @@ namespace snake {
                    score(0),
                    snake_size(1),
                    ended(false),
-                   have_food_on_board(false){
+                   have_food_on_board(false) {
         field[Game::WIDTH / 2][Game::HEIGHT / 2] = cell::SNAKE;
         //TODO make constants to better code style
     }
@@ -83,17 +85,19 @@ namespace snake {
             field[y][x] = value;
         }
     }
+
     void Game::create_food() {
-        while(true){
-            int x_food = rand()%Game::WIDTH;
-            int y_food = rand()%Game::HEIGHT;
-            if(get_cell(x_food, y_food) == cell::EMPTY){
+        while (true) {
+            int x_food = rand() % Game::WIDTH;
+            int y_food = rand() % Game::HEIGHT;
+            if (get_cell(x_food, y_food) == cell::EMPTY) {
                 set_cell(x_food, y_food, cell::FOOD);
                 have_food_on_board = true;
                 return;
             }
         }
     }
+
     void Game::increase_snake() {
         snake_size++;
         auto snake_end = snake.back();
@@ -139,14 +143,21 @@ namespace snake {
         }
         set_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate, snake::cell::SNAKE);
     }
+
     bool Game::no_food() {
         return !have_food_on_board;
     }
+
     bool Game::check_is_ended() {
         //TODO implement this function
-        //if(snake ate itself){
-        //  is_ended() = true;
-        // }
+        for (int i = 1; i < snake_size; i++) {
+            if (getBlock(i).x_coordinate == getBlock(0).x_coordinate and
+                getBlock(i).y_coordinate == getBlock(0).y_coordinate and
+                getBlock(i).block_direction != direction::NONE) {
+                is_ended() = true;
+                break;
+            }
+        }
         return is_ended();
     }
 };

@@ -70,6 +70,7 @@ namespace snake {
                 end_game();
                 return direction::NONE;
             case 'p':
+                //TODO normal pause
                 return direction::NONE;
             default:
                 return game_.get_direction();
