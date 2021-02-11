@@ -11,7 +11,7 @@ namespace snake {
     }
 
     View::View(Game &game) : game_(game) {
-        initscr();
+        WINDOW * wnd = initscr();
         raw();
         noecho();
         keypad(stdscr, TRUE);

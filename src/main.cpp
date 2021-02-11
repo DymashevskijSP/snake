@@ -3,7 +3,7 @@
 
 namespace {
     //TODO fix constants
-    const int delay = 10;
+    const int delay = 100;
 }
 
 void play_game() {
@@ -11,11 +11,9 @@ void play_game() {
     snake::View view(game);
     while (!game.is_ended()) {
         view.draw_board();
-        snake::direction next_direction = snake::direction::NONE;
-        for (int i = 0; i< delay; i++) {
-            next_direction = view.get_direction();
+        for (int i = 0; i < delay; i++) {
+            game.change_direction(view.get_direction());
         }
-        game.change_direction(next_direction);
         game.make_move();
         game.check_is_ended();
     }
