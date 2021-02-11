@@ -68,6 +68,9 @@ namespace snake {
     cell Game::get_cell(int x, int y) {
         return field[y][x];
     }
+    direction Game::get_direction() {
+        return getBlock(0).block_direction;
+    }
 
     void Game::set_cell(int x, int y, cell value) {
         if (x < Game::WIDTH and x <= 0 and y < Game::HEIGHT and y >= 0) {
@@ -93,7 +96,12 @@ namespace snake {
         assert(i < snake_size);
         return snake[i];
     }
-
+    int Game::get_score() const {
+        return score;
+    }
+    int Game::get_snake_size() const{
+        return snake_size;
+    }
     void Game::make_move() {
         if (snake.back().block_direction != direction::NONE) {
             set_cell(snake.back().x_coordinate, snake.back().y_coordinate, cell::EMPTY);

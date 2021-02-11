@@ -43,6 +43,11 @@ namespace snake {
 
         void set_cell(int x, int y, cell value);
 
+        direction get_direction();
+
+        int get_score() const;
+        int get_snake_size() const;
+
     private:
         bool ended;
         int snake_size;
