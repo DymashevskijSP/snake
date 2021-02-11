@@ -12,10 +12,13 @@ void play_game() {
     while (!game.is_ended()) {
         view.draw_board();
         for (int i = 0; i < delay; i++) {
-            game.change_direction(view.get_direction());
+            game.change_direction(view.get_turn());
         }
         game.make_move();
         game.check_is_ended();
+        if(game.no_food()){
+            game.create_food();
+        }
     }
     view.end_game();
 }

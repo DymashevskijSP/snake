@@ -10,7 +10,7 @@ namespace snake {
 
         void draw_board();
 
-        direction get_direction();
+        direction get_turn();
 
         void end_game() const;
 

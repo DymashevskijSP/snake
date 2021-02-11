@@ -11,7 +11,7 @@ namespace snake {
     }
 
     View::View(Game &game) : game_(game) {
-        WINDOW * wnd = initscr();
+        WINDOW *wnd = initscr();
         raw();
         noecho();
         keypad(stdscr, TRUE);
@@ -42,7 +42,7 @@ namespace snake {
         clear();
         move(0, 0);
         addstr("Current score: ");
-        printf("%d", game_.get_score());
+        printw("%d", game_.get_score());
         addch('\n');
         for (int y = 0; y < Game::HEIGHT; y++) {
             for (int x = 0; x < Game::WIDTH; x++) {
@@ -52,7 +52,7 @@ namespace snake {
         }
     }
 
-    direction View::get_direction() {
+    direction View::get_turn() {
         //TODO make asynchronous input
         int ch = getch();
         switch (ch) {
@@ -66,6 +66,11 @@ namespace snake {
                 return direction::RIGHT;
             case ERR:
                 return game_.get_direction();
+            case 'q':
+                end_game();
+                return direction::NONE;
+            case 'p':
+                return direction::NONE;
             default:
                 return game_.get_direction();
         }
@@ -82,9 +87,11 @@ namespace snake {
         } else {
             addstr("You won! congratulations!");
         }
+        game_.is_ended()=true;
         move(Game::HEIGHT, Game::WIDTH);
         addstr("Press any key to continue");
         getch();
+        clear();
         endwin();
     }
 }

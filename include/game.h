@@ -47,14 +47,19 @@ namespace snake {
 
         bool check_is_ended();
 
+        void create_food();
+
         [[nodiscard]] int get_score() const;
 
         [[nodiscard]] int get_snake_size() const;
+
+        bool no_food();
 
     private:
         bool ended;
         int snake_size;
         int score;
+        bool have_food_on_board;
         std::vector<std::vector<cell>> field;
         std::vector<snake_part> snake;
     };

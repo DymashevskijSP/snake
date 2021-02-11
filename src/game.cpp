@@ -1,5 +1,5 @@
 #include"game.h"
-
+#include <cstdlib>
 namespace snake {
     namespace {
         bool not_opposite(snake::direction first_dir, snake::direction second_dir) {
@@ -59,7 +59,8 @@ namespace snake {
                                   snake::Game::WIDTH / 2, snake::Game::HEIGHT / 2}}),
                    score(0),
                    snake_size(1),
-                   ended(false) {
+                   ended(false),
+                   have_food_on_board(false){
         field[Game::WIDTH / 2][Game::HEIGHT / 2] = cell::SNAKE;
         //TODO make constants to better code style
     }
@@ -82,7 +83,17 @@ namespace snake {
             field[y][x] = value;
         }
     }
-
+    void Game::create_food() {
+        while(true){
+            int x_food = rand()%Game::WIDTH;
+            int y_food = rand()%Game::HEIGHT;
+            if(get_cell(x_food, y_food) == cell::EMPTY){
+                set_cell(x_food, y_food, cell::FOOD);
+                have_food_on_board = true;
+                return;
+            }
+        }
+    }
     void Game::increase_snake() {
         snake_size++;
         auto snake_end = snake.back();
@@ -116,16 +127,21 @@ namespace snake {
         }
         for (int i = snake_size - 1; i >= 0; i--) {
             getBlock(i).move();
+
             if (i > 0) {
+                set_cell(getBlock(i).x_coordinate, getBlock(i).y_coordinate, cell::SNAKE);
                 getBlock(i).set_direction(getBlock(i - 1).block_direction);
             }
         }
-        set_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate, snake::cell::SNAKE);
         if (get_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate) == snake::cell::FOOD) {
             increase_snake();
+            have_food_on_board = false;
         }
+        set_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate, snake::cell::SNAKE);
     }
-
+    bool Game::no_food() {
+        return !have_food_on_board;
+    }
     bool Game::check_is_ended() {
         //TODO implement this function
         //if(snake ate itself){
