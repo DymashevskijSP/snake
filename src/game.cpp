@@ -117,4 +117,9 @@ namespace snake {
             increase_snake();
         }
     }
+
+    bool Game::check_win() {
+        //TODO implement this function
+        return false;
+    }
 };

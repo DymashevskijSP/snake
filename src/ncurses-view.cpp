@@ -18,6 +18,7 @@ namespace snake {
         init_pair(3, SNAKE_COLOR, SNAKE_COLOR);
     }
     void View::draw_cell(cell c) {
+        //TODO make colours
         if(c==cell::EMPTY){
             addch(' ');
         }

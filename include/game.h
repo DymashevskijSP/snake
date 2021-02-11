@@ -45,7 +45,10 @@ namespace snake {
 
         direction get_direction();
 
+        bool check_win();
+
         int get_score() const;
+
         int get_snake_size() const;
 
     private:
