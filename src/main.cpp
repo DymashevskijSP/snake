@@ -17,7 +17,7 @@ void play_game() {
         }
         game.change_direction(next_direction);
         game.make_move();
-        game.is_ended() = game.check_is_ended();
+        game.check_is_ended();
     }
     view.end_game();
 }

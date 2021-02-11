@@ -32,7 +32,7 @@ namespace snake {
                 y = Game::HEIGHT - 1;
             }
         }
-    }
+    }//namespace
 
     void snake_part::move() {
         if (block_direction == direction::LEFT) {
@@ -53,14 +53,17 @@ namespace snake {
     void snake_part::set_direction(direction new_direction) {
         block_direction = new_direction;
     }
-
-    Game::Game() {
-        field = std::vector<std::vector<cell>>(Game::HEIGHT, std::vector<cell>(Game::WIDTH));
-        snake = {{snake::direction::NONE, Game::WIDTH / 2, Game::HEIGHT / 2}};
-        score = 0;
-        snake_size = 1;
-        ended = false;
+    Game::Game() : field(std::vector<std::vector<cell>>(
+            snake::Game::HEIGHT, std::vector<cell>(snake::Game::WIDTH, cell::EMPTY))),
+                   snake({{snake::direction::NONE,
+                                  snake::Game::WIDTH / 2, snake::Game::HEIGHT / 2}}),
+                   score(0),
+                   snake_size(1),
+                   ended(false) {
+        field[Game::WIDTH / 2][Game::HEIGHT / 2] = cell::SNAKE;
+        //TODO make constants to better code style
     }
+
 
     bool &Game::is_ended() {
         return ended;

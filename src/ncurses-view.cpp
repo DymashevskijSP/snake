@@ -7,7 +7,7 @@ namespace snake {
         const short FIELD_COLOR = COLOR_BLACK;
         const short FOOD_COLOR = COLOR_BLUE;
         const short SNAKE_COLOR = COLOR_RED;
-        const int ping = 10;
+        const int ping = 1;
     }
 
     View::View(Game &game) : game_(game) {
@@ -25,12 +25,15 @@ namespace snake {
         //TODO make colours
         if (c == cell::EMPTY) {
             addch(' ');
+            return;
         }
         if (c == cell::FOOD) {
             addch('X');
+            return;
         }
         if (c == cell::SNAKE) {
             addch('O');
+            return;
         }
         assert(0);
     }

@@ -4,7 +4,7 @@
 namespace snake {
     struct View {
     public:
-        Game game_;
+        Game &game_;
 
         explicit View(Game &g);
 
