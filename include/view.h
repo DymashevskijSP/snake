@@ -11,12 +11,12 @@ namespace snake {
         void draw_board();
 
         direction get_turn();
-
+        static void draw_border();
         void end_game() const;
 
-        void draw_pause() const;
+        static void draw_pause() ;
 
-        void draw_cell(cell c);
+        static void draw_cell(cell c);
     };
 }
 #endif //SNAKE_VIEW_H

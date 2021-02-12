@@ -9,6 +9,7 @@ namespace snake {
         const short SNAKE_COLOR = COLOR_RED;
         const short TEXT_COLOR = COLOR_WHITE;
         const short TELEPORT_COLOR = COLOR_GREEN;
+        const short int BORDER_COLOR = COLOR_WHITE;
         const int ping = 1;
     }
 
@@ -18,7 +19,8 @@ namespace snake {
         noecho();
         keypad(stdscr, TRUE);
         start_color();
-        init_pair(1, TEXT_COLOR, FIELD_COLOR);
+        init_pair(1, BORDER_COLOR, BORDER_COLOR);
+        init_pair(5, TEXT_COLOR, FIELD_COLOR);
         init_pair(2, FOOD_COLOR, FOOD_COLOR);
         init_pair(3, SNAKE_COLOR, SNAKE_COLOR);
         init_pair(4, TELEPORT_COLOR, TELEPORT_COLOR);
@@ -27,10 +29,9 @@ namespace snake {
     }
 
     void View::draw_cell(cell c) {
-        //TODO make colours
 
         if (c == cell::EMPTY) {
-            attron(COLOR_PAIR(1));
+            attron(COLOR_PAIR(5));
         }
         if (c == cell::FOOD) {
             attron(COLOR_PAIR(2));
@@ -44,20 +45,25 @@ namespace snake {
 
         addch(' ');
         addch(' ');
-        attron(COLOR_PAIR(0));
+        attron(COLOR_PAIR(5));
 
     }
 
     void View::draw_board() {
         clear();
         move(0, 0);
+        attron(COLOR_PAIR(5));
         addstr("Current score: ");
         printw("%d", game_.get_score());
         addch('\n');
-        for (int y = 0; y < Game::HEIGHT; y++) {
-            for (int x = 0; x < Game::WIDTH; x++) {
-                draw_cell(game_.get_cell(x, y));
-            }
+        for (int y = 0; y <= Game::HEIGHT+1; y++) {
+            for (int x = 0; x <= Game::WIDTH+1; x++) {
+                if(x == 0 or y == 0 or x == Game::WIDTH+1 or y==Game::HEIGHT+1){
+                    draw_border();
+                }else {
+                    draw_cell(game_.get_cell(x-1, y-1));
+                }
+                }
             addch('\n');
         }
     }
@@ -113,9 +119,16 @@ namespace snake {
         endwin();
     }
 
-    void View::draw_pause() const {
+    void View::draw_pause() {
         clear();
         move(snake::Game::WIDTH, snake::Game::HEIGHT);
         addstr("Game is paused");
+    }
+
+    void View::draw_border() {
+        attron(COLOR_PAIR(1));
+        addch(' ');
+        addch(' ');
+        attron(COLOR_PAIR(5));
     }
 }
