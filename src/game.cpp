@@ -4,6 +4,9 @@
 namespace snake {
     namespace {
 
+        bool random_generate_teleport() {
+            return rand() % 1337 == 228;
+        }
 
         void normilize_coordinates(int &x, int &y) {
             if (x >= Game::WIDTH) {
@@ -37,7 +40,7 @@ namespace snake {
     }
 
     void Game::move_head() {
-        snake_part& head = getBlock(0);
+        snake_part &head = get_block(0);
         if (head.block_direction == direction::LEFT) {
             head.x_coordinate--;
         }
@@ -52,10 +55,12 @@ namespace snake {
         }
         normilize_coordinates(head.x_coordinate, head.y_coordinate);
     }
-    void snake_part::move_block(snake_part& other){
+
+    void snake_part::move_block(snake_part &other) {
         x_coordinate = other.x_coordinate;
         y_coordinate = other.y_coordinate;
     }
+
     void snake_part::set_direction(direction new_direction) {
         block_direction = new_direction;
     }
@@ -66,10 +71,9 @@ namespace snake {
                                   snake::Game::WIDTH / 2, snake::Game::HEIGHT / 2}}),
                    score(0),
                    snake_size(1),
-                   ended(false),
-                   have_food_on_board(false) {
+                   ended(false), paused(false), teleportation_place(0, 0, 0, 0) {
         field[Game::HEIGHT / 2][Game::WIDTH / 2] = cell::SNAKE;
-        //TODO make constants to better code style
+
     }
 
 
@@ -82,7 +86,7 @@ namespace snake {
     }
 
     direction Game::get_direction() {
-        return getBlock(0).block_direction;
+        return get_block(0).block_direction;
     }
 
     void Game::set_cell(int x, int y, cell value) {
@@ -97,7 +101,7 @@ namespace snake {
             int y_food = rand() % Game::HEIGHT;
             if (get_cell(x_food, y_food) == cell::EMPTY) {
                 set_cell(x_food, y_food, cell::FOOD);
-                have_food_on_board = true;
+                all_food.emplace_back(x_food, y_food);
                 return;
             }
         }
@@ -111,11 +115,11 @@ namespace snake {
     }
 
     void Game::change_direction(direction another_direction) {
-        auto &head = getBlock(0);
+        auto &head = get_block(0);
         head.set_direction(another_direction);
     }//Do not checks if direction is correct, because of this check in main
 
-    snake_part &Game::getBlock(int i) {
+    snake_part &Game::get_block(int i) {
         assert(i < snake_size);
         return snake[i];
     }
@@ -129,6 +133,34 @@ namespace snake {
     }
 
     void Game::make_move() {
+        if (paused)return;
+        if (!teleport_activated) {
+            if (random_generate_teleport()) {
+                create_teleport();
+            }
+        } else {
+            if (get_cell(teleportation_place.x, teleportation_place.y) != cell::TELEPORT) {
+                set_cell(teleportation_place.x, teleportation_place.y, cell::TELEPORT);
+            }
+            if (get_cell(teleportation_place.x2, teleportation_place.y2) != cell::TELEPORT) {
+                set_cell(teleportation_place.x2, teleportation_place.y2, cell::TELEPORT);
+            }
+        }
+        std::vector<std::list<food>::iterator> to_remove;
+        for (auto it = all_food.begin(); it != all_food.end(); it++) {
+            if (get_cell((*it).x, (*it).y) != cell::FOOD or time(nullptr) - (*it).time_created > food::lifetime) {
+                set_cell((*it).x, (*it).y, cell::EMPTY);
+                to_remove.push_back(it);
+            }
+        }
+        if (teleport_activated) {
+            if (teleportation_place.time_created + snake::teleport::lifetime < time(nullptr)) {
+                remove_teleport();
+            }
+        }
+        for (auto it: to_remove) {
+            all_food.erase(it);
+        }
         if (snake.back().block_direction != direction::NONE) {
             set_cell(snake.back().x_coordinate, snake.back().y_coordinate, cell::EMPTY);
         }
@@ -136,33 +168,91 @@ namespace snake {
 
 
             if (i > 0) {
-                getBlock(i).move_block(getBlock(i-1));
-                set_cell(getBlock(i).x_coordinate, getBlock(i).y_coordinate, cell::SNAKE);
-                getBlock(i).set_direction(getBlock(i - 1).block_direction);
+                get_block(i).move_block(get_block(i - 1));
+                set_cell(get_block(i).x_coordinate, get_block(i).y_coordinate, cell::SNAKE);
+                get_block(i).set_direction(get_block(i - 1).block_direction);
             }
         }
         move_head();
-        if (get_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate) == snake::cell::FOOD) {
+        if (get_cell(get_block(0).x_coordinate, get_block(0).y_coordinate) == snake::cell::FOOD) {
             increase_snake();
-            have_food_on_board = false;
         }
-        set_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate, snake::cell::SNAKE);
+        if (is_teleport_activated() and get_block(0).x_coordinate == teleportation_place.x and
+            get_block(0).y_coordinate == teleportation_place.y) {
+            get_block(0).x_coordinate = teleportation_place.x2;
+            get_block(0).y_coordinate = teleportation_place.y2;
+        } else if (is_teleport_activated() and get_block(0).x_coordinate == teleportation_place.x2 and
+                   get_block(0).y_coordinate == teleportation_place.y2) {
+            get_block(0).x_coordinate = teleportation_place.x;
+            get_block(0).y_coordinate = teleportation_place.y;
+        }
+        set_cell(get_block(0).x_coordinate, get_block(0).y_coordinate, snake::cell::SNAKE);
     }
 
     bool Game::no_food() {
-        return !have_food_on_board;
+        return all_food.empty();
+    }
+
+    bool Game::is_paused() const {
+        return paused;
+    }
+
+    void Game::pause() {
+        paused = !paused;
     }
 
     bool Game::check_is_ended() {
-        //TODO implement this function
+        if (is_ended()) {
+            return is_ended();
+        }
         for (int i = 1; i < snake_size; i++) {
-            if (getBlock(i).x_coordinate == getBlock(0).x_coordinate and
-                getBlock(i).y_coordinate == getBlock(0).y_coordinate and
-                getBlock(i).block_direction != direction::NONE) {
+            if (get_block(i).x_coordinate == get_block(0).x_coordinate and
+                get_block(i).y_coordinate == get_block(0).y_coordinate and
+                get_block(i).block_direction != direction::NONE) {
                 is_ended() = true;
                 break;
             }
         }
         return is_ended();
     }
+
+    bool Game::is_teleport_activated() const {
+        return teleport_activated;
+    }
+
+    void Game::create_teleport() {
+        if (!teleport_activated) {
+            while (true) {
+                int xin = rand() % Game::WIDTH;
+                int yin = rand() % Game::HEIGHT;
+                int xout = rand() % Game::WIDTH;
+                int yout = rand() % Game::HEIGHT;
+                if (xin == xout and yin == yout) {
+                    continue;
+                }
+                if (get_cell(xin, yin) == cell::EMPTY and get_cell(xout, yout) == cell::EMPTY) {
+                    teleportation_place = teleport(xin, yin, xout, yout);
+                    teleport_activated = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    void Game::remove_teleport() {
+        if (teleport_activated) {
+            teleport_activated = false;
+            if (get_cell(teleportation_place.x, teleportation_place.y) == cell::TELEPORT) {
+                set_cell(teleportation_place.x, teleportation_place.y, cell::EMPTY);
+            }
+            if (get_cell(teleportation_place.x2, teleportation_place.y2) == cell::TELEPORT) {
+                set_cell(teleportation_place.x2, teleportation_place.y2, cell::EMPTY);
+            }
+        }
+    }
+
+    food::food(int x_, int y_) : x(x_), y(y_), time_created(time(nullptr)) {}
+
+    teleport::teleport(int x_, int y_, int x2_, int y2_) : x(x_), y(y_), x2(x2_), y2(y2_),
+                                                           time_created(time(nullptr)) {}
 };

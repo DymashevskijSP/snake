@@ -4,10 +4,11 @@
 
 namespace snake {
     namespace {
-        const short FIELD_COLOR = COLOR_WHITE;
+        const short FIELD_COLOR = COLOR_BLACK;
         const short FOOD_COLOR = COLOR_BLUE;
         const short SNAKE_COLOR = COLOR_RED;
-        const short TEXT_COLOR = COLOR_BLACK;
+        const short TEXT_COLOR = COLOR_WHITE;
+        const short TELEPORT_COLOR = COLOR_GREEN;
         const int ping = 1;
     }
 
@@ -17,9 +18,10 @@ namespace snake {
         noecho();
         keypad(stdscr, TRUE);
         start_color();
-        init_pair(1, TEXT_COLOR,FIELD_COLOR);
+        init_pair(1, TEXT_COLOR, FIELD_COLOR);
         init_pair(2, FOOD_COLOR, FOOD_COLOR);
         init_pair(3, SNAKE_COLOR, SNAKE_COLOR);
+        init_pair(4, TELEPORT_COLOR, TELEPORT_COLOR);
         curs_set(0);
         timeout(ping);
     }
@@ -29,28 +31,21 @@ namespace snake {
 
         if (c == cell::EMPTY) {
             attron(COLOR_PAIR(1));
-            addch(' ');
-            addch(' ');
-            attron(COLOR_PAIR(0));
-            return;
         }
         if (c == cell::FOOD) {
             attron(COLOR_PAIR(2));
-            addch(' ');
-            addch(' ');
-
-            attron(COLOR_PAIR(0));
-            return;
         }
         if (c == cell::SNAKE) {
             attron(COLOR_PAIR(3));
-            addch(' ');
-            addch(' ');
-            attron(COLOR_PAIR(0));
-            return;
+        }
+        if (c == cell::TELEPORT) {
+            attron(COLOR_PAIR(4));
         }
 
-        assert(0);
+        addch(' ');
+        addch(' ');
+        attron(COLOR_PAIR(0));
+
     }
 
     void View::draw_board() {
@@ -68,7 +63,6 @@ namespace snake {
     }
 
     direction View::get_turn() {
-        //TODO make asynchronous input
         int ch = getch();
         switch (ch) {
             case (KEY_UP):
@@ -82,11 +76,10 @@ namespace snake {
             case ERR:
                 return game_.get_direction();
             case 'q':
-                end_game();
+                game_.is_ended() = true;
                 return direction::NONE;
             case 'p':
-                //TODO normal pause
-                return direction::NONE;
+                game_.pause();
             default:
                 return game_.get_direction();
         }
@@ -110,5 +103,11 @@ namespace snake {
         getch();
         clear();
         endwin();
+    }
+
+    void View::draw_pause() const {
+        clear();
+        move(snake::Game::WIDTH, snake::Game::HEIGHT);
+        addstr("Game is paused");
     }
 }

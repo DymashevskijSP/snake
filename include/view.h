@@ -14,6 +14,8 @@ namespace snake {
 
         void end_game() const;
 
+        void draw_pause() const;
+
         void draw_cell(cell c);
     };
 }

@@ -3,6 +3,9 @@
 
 #include<vector>
 #include<cassert>
+#include<ctime>
+#include <list>
+#include <optional>
 
 namespace snake {
     enum class direction {
@@ -11,7 +14,9 @@ namespace snake {
     enum class cell {
         EMPTY, SNAKE, FOOD, TELEPORT
     };
+
     bool not_opposite(direction, direction);
+
     struct snake_part {
         direction block_direction;
         int x_coordinate;
@@ -21,20 +26,32 @@ namespace snake {
 
         void set_direction(direction new_direction);
     };
-    struct teleport{
-        //TODO implement all teleport features
+    //it is possible to create class temporary and inherit food and teleport, but do we really need it in snake game?
+    struct teleport {
+        int x, y, x2, y2;
+        int time_created;
+        static const int lifetime = 30;
+        teleport(int x_, int y_, int x2_, int y2_);
     };
-    struct food{
-        //TODO make food struct to provide lifetime
+
+    struct food {
+        static const int lifetime = 10;
+        int x, y, time_created;
+
+        food(int x_, int y_);
+
     };
+
 
     struct Game {
     private:
         void move_head();
-        snake_part &getBlock(int i);
+
+        snake_part &get_block(int i);
+
     public:
-        static const int WIDTH = 100;
-        static const int HEIGHT = 50;
+        static const int WIDTH = 30;
+        static const int HEIGHT = 30;
 
         Game();
 
@@ -53,10 +70,16 @@ namespace snake {
 
         direction get_direction();
 
+        [[nodiscard]] bool is_paused() const;
+
         bool check_is_ended();
 
-        void create_food();
+        void pause();
 
+        bool is_teleport_activated() const;
+        void create_teleport();
+        void create_food();
+        void remove_teleport();
         [[nodiscard]] int get_score() const;
 
         [[nodiscard]] int get_snake_size() const;
@@ -67,9 +90,12 @@ namespace snake {
         bool ended;
         int snake_size;
         int score;
-        bool have_food_on_board;
+        bool teleport_activated;
+        teleport teleportation_place;
+        bool paused = false;
         std::vector<std::vector<cell>> field;
         std::vector<snake_part> snake;
+        std::list<food> all_food;
     };
 }//snake
 #endif //SNAKE_GAME_H
