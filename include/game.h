@@ -9,23 +9,32 @@ namespace snake {
         LEFT, RIGHT, BOTTOM, TOP, NONE
     };
     enum class cell {
-        EMPTY, SNAKE, FOOD
+        EMPTY, SNAKE, FOOD, TELEPORT
     };
-
+    bool not_opposite(direction, direction);
     struct snake_part {
         direction block_direction;
         int x_coordinate;
         int y_coordinate;
 
-        void move();
+        void move_block(snake_part &other);
 
         void set_direction(direction new_direction);
     };
+    struct teleport{
+        //TODO implement all teleport features
+    };
+    struct food{
+        //TODO make food struct to provide lifetime
+    };
 
     struct Game {
+    private:
+        void move_head();
+        snake_part &getBlock(int i);
     public:
-        static const int WIDTH = 20;
-        static const int HEIGHT = 20;
+        static const int WIDTH = 100;
+        static const int HEIGHT = 50;
 
         Game();
 
@@ -39,7 +48,6 @@ namespace snake {
 
         void increase_snake();
 
-        snake_part &getBlock(int i);
 
         void set_cell(int x, int y, cell value);
 

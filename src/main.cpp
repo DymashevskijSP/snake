@@ -11,8 +11,12 @@ void play_game() {
     snake::View view(game);
     while (!game.is_ended()) {
         view.draw_board();
+        auto prev_direction = game.get_direction();
         for (int i = 0; i < delay; i++) {
-            game.change_direction(view.get_turn());
+            auto next_direction = view.get_turn();
+            if(snake::not_opposite(prev_direction, next_direction)){
+                game.change_direction(next_direction);
+            }
         }
         game.make_move();
         game.check_is_ended();

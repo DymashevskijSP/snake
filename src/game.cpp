@@ -3,21 +3,7 @@
 
 namespace snake {
     namespace {
-        bool not_opposite(snake::direction first_dir, snake::direction second_dir) {
-            if (first_dir == snake::direction::BOTTOM) {
-                return second_dir != snake::direction::TOP;
-            }
-            if (first_dir == snake::direction::TOP) {
-                return second_dir != snake::direction::BOTTOM;
-            }
-            if (first_dir == snake::direction::LEFT) {
-                return second_dir != snake::direction::RIGHT;
-            }
-            if (first_dir == snake::direction::RIGHT) {
-                return second_dir != snake::direction::LEFT;
-            }
-            return first_dir == snake::direction::NONE || second_dir == snake::direction::NONE;
-        }
+
 
         void normilize_coordinates(int &x, int &y) {
             if (x >= Game::WIDTH) {
@@ -34,23 +20,42 @@ namespace snake {
             }
         }
     }//namespace
-
-    void snake_part::move() {
-        if (block_direction == direction::LEFT) {
-            x_coordinate--;
+    bool not_opposite(snake::direction first_dir, snake::direction second_dir) {
+        if (first_dir == snake::direction::BOTTOM) {
+            return second_dir != snake::direction::TOP;
         }
-        if (block_direction == direction::RIGHT) {
-            x_coordinate++;
+        if (first_dir == snake::direction::TOP) {
+            return second_dir != snake::direction::BOTTOM;
         }
-        if (block_direction == direction::TOP) {
-            y_coordinate--;
+        if (first_dir == snake::direction::LEFT) {
+            return second_dir != snake::direction::RIGHT;
         }
-        if (block_direction == direction::BOTTOM) {
-            y_coordinate++;
+        if (first_dir == snake::direction::RIGHT) {
+            return second_dir != snake::direction::LEFT;
         }
-        normilize_coordinates(x_coordinate, y_coordinate);
+        return first_dir == snake::direction::NONE || second_dir == snake::direction::NONE;
     }
 
+    void Game::move_head() {
+        snake_part& head = getBlock(0);
+        if (head.block_direction == direction::LEFT) {
+            head.x_coordinate--;
+        }
+        if (head.block_direction == direction::RIGHT) {
+            head.x_coordinate++;
+        }
+        if (head.block_direction == direction::TOP) {
+            head.y_coordinate--;
+        }
+        if (head.block_direction == direction::BOTTOM) {
+            head.y_coordinate++;
+        }
+        normilize_coordinates(head.x_coordinate, head.y_coordinate);
+    }
+    void snake_part::move_block(snake_part& other){
+        x_coordinate = other.x_coordinate;
+        y_coordinate = other.y_coordinate;
+    }
     void snake_part::set_direction(direction new_direction) {
         block_direction = new_direction;
     }
@@ -63,7 +68,7 @@ namespace snake {
                    snake_size(1),
                    ended(false),
                    have_food_on_board(false) {
-        field[Game::WIDTH / 2][Game::HEIGHT / 2] = cell::SNAKE;
+        field[Game::HEIGHT / 2][Game::WIDTH / 2] = cell::SNAKE;
         //TODO make constants to better code style
     }
 
@@ -107,10 +112,8 @@ namespace snake {
 
     void Game::change_direction(direction another_direction) {
         auto &head = getBlock(0);
-        if (not_opposite(another_direction, head.block_direction)) {
-            head.set_direction(another_direction);
-        }
-    }
+        head.set_direction(another_direction);
+    }//Do not checks if direction is correct, because of this check in main
 
     snake_part &Game::getBlock(int i) {
         assert(i < snake_size);
@@ -130,13 +133,15 @@ namespace snake {
             set_cell(snake.back().x_coordinate, snake.back().y_coordinate, cell::EMPTY);
         }
         for (int i = snake_size - 1; i >= 0; i--) {
-            getBlock(i).move();
+
 
             if (i > 0) {
+                getBlock(i).move_block(getBlock(i-1));
                 set_cell(getBlock(i).x_coordinate, getBlock(i).y_coordinate, cell::SNAKE);
                 getBlock(i).set_direction(getBlock(i - 1).block_direction);
             }
         }
+        move_head();
         if (get_cell(getBlock(0).x_coordinate, getBlock(0).y_coordinate) == snake::cell::FOOD) {
             increase_snake();
             have_food_on_board = false;
