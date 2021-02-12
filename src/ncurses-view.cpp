@@ -73,6 +73,14 @@ namespace snake {
                 return direction::LEFT;
             case (KEY_RIGHT):
                 return direction::RIGHT;
+            case( 'w'):
+                return direction::TOP;
+            case('a'):
+                return direction::LEFT;
+            case('d'):
+                return direction::RIGHT;
+            case('s'):
+                return direction::BOTTOM;
             case ERR:
                 return game_.get_direction();
             case 'q':
