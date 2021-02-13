@@ -1,13 +1,14 @@
-#include"game.h"
-#include"view.h"
+#include "game.h"
+#include "view.h"
 
 namespace {
     const int delay = 90;
-}
+}//namespace
 
 void play_game() {
     snake::Game game;
     snake::View view(game);
+    view.start();
     while (!game.is_ended()) {
         if (!game.is_paused()) {
             view.draw_board();

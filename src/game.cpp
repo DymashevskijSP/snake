@@ -1,4 +1,4 @@
-#include"game.h"
+#include "game.h"
 #include <cstdlib>
 
 namespace snake {
@@ -66,14 +66,17 @@ namespace snake {
     }
 
     Game::Game() : field(std::vector<std::vector<cell>>(
-            snake::Game::HEIGHT, std::vector<cell>(snake::Game::WIDTH, cell::EMPTY))),
-                   snake({{snake::direction::NONE,
-                                  snake::Game::WIDTH / 2, snake::Game::HEIGHT / 2}}),
+                           snake::Game::HEIGHT, std::vector<cell>(snake::Game::WIDTH, cell::EMPTY))),
                    score(0),
-                   snake_size(1),
-                   ended(false), paused(false), teleportation_place(0, 0, 0, 0) {
-        field[Game::HEIGHT / 2][Game::WIDTH / 2] = cell::SNAKE;
-
+                   snake_size(3),
+                   ended(false), paused(false), teleportation_place(0, 0, 0, 0), snake({}) {
+        snake.push_back({direction::NONE, SNAKE_START_X_COORDINATE, SNAKE_START_Y_COORDINATE});
+        field[SNAKE_START_Y_COORDINATE][SNAKE_START_X_COORDINATE] = cell::SNAKE;
+        snake.push_back({direction::NONE, SNAKE_START_X_COORDINATE - 1, SNAKE_START_Y_COORDINATE});
+        field[SNAKE_START_Y_COORDINATE][SNAKE_START_X_COORDINATE - 1] = cell::SNAKE;
+        snake.push_back({direction::NONE, SNAKE_START_X_COORDINATE - 2, SNAKE_START_Y_COORDINATE});
+        field[SNAKE_START_Y_COORDINATE][SNAKE_START_X_COORDINATE - 2] = cell::SNAKE;
+        change_direction(direction::RIGHT);
     }
 
 
@@ -133,7 +136,7 @@ namespace snake {
     }
 
     void Game::make_move() {
-        if (paused)return;
+        if (paused) return;
         if (!teleport_activated) {
             if (random_generate_teleport()) {
                 create_teleport();
@@ -158,10 +161,10 @@ namespace snake {
                 remove_teleport();
             }
         }
-        for (auto it: to_remove) {
+        for (auto it : to_remove) {
             all_food.erase(it);
         }
-        if (snake.back().block_direction != direction::NONE) {
+        if (started and !paused) {
             set_cell(snake.back().x_coordinate, snake.back().y_coordinate, cell::EMPTY);
         }
         for (int i = snake_size - 1; i >= 0; i--) {
@@ -255,4 +258,4 @@ namespace snake {
 
     teleport::teleport(int x_, int y_, int x2_, int y2_) : x(x_), y(y_), x2(x2_), y2(y2_),
                                                            time_created(time(nullptr)) {}
-};
+};// namespace snake

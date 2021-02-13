@@ -1,5 +1,5 @@
 #include "game.h"
-#include"view.h"
+#include "view.h"
 #include <ncurses.h>
 
 namespace snake {
@@ -11,7 +11,7 @@ namespace snake {
         const short TELEPORT_COLOR = COLOR_GREEN;
         const short int BORDER_COLOR = COLOR_WHITE;
         const int ping = 1;
-    }
+    }// namespace
 
     View::View(Game &game) : game_(game) {
         initscr();
@@ -46,9 +46,17 @@ namespace snake {
         addch(' ');
         addch(' ');
         attron(COLOR_PAIR(5));
-
     }
+    void View::start() {
+        draw_board();
+        while (true) {
+            int ch = getch();
+            if (ch == ERR) continue;
 
+            game_.started = true;
+            break;
+        }
+    }
     void View::draw_board() {
         clear();
         move(0, 0);
@@ -56,14 +64,14 @@ namespace snake {
         addstr("Current score: ");
         printw("%d", game_.get_score());
         addch('\n');
-        for (int y = 0; y <= Game::HEIGHT+1; y++) {
-            for (int x = 0; x <= Game::WIDTH+1; x++) {
-                if(x == 0 or y == 0 or x == Game::WIDTH+1 or y==Game::HEIGHT+1){
+        for (int y = 0; y <= Game::HEIGHT + 1; y++) {
+            for (int x = 0; x <= Game::WIDTH + 1; x++) {
+                if (x == 0 or y == 0 or x == Game::WIDTH + 1 or y == Game::HEIGHT + 1) {
                     draw_border();
-                }else {
-                    draw_cell(game_.get_cell(x-1, y-1));
+                } else {
+                    draw_cell(game_.get_cell(x - 1, y - 1));
                 }
-                }
+            }
             addch('\n');
         }
     }
@@ -79,13 +87,13 @@ namespace snake {
                 return direction::LEFT;
             case (KEY_RIGHT):
                 return direction::RIGHT;
-            case( 'w'):
+            case ('w'):
                 return direction::TOP;
-            case('a'):
+            case ('a'):
                 return direction::LEFT;
-            case('d'):
+            case ('d'):
                 return direction::RIGHT;
-            case('s'):
+            case ('s'):
                 return direction::BOTTOM;
             case ERR:
                 return game_.get_direction();
@@ -131,4 +139,4 @@ namespace snake {
         addch(' ');
         attron(COLOR_PAIR(5));
     }
-}
+}// namespace snake

@@ -1,18 +1,25 @@
 #ifndef SNAKE_GAME_H
 #define SNAKE_GAME_H
 
-#include<vector>
-#include<cassert>
-#include<ctime>
+#include <cassert>
+#include <ctime>
 #include <list>
 #include <optional>
+#include <vector>
 
 namespace snake {
     enum class direction {
-        LEFT, RIGHT, BOTTOM, TOP, NONE
+        LEFT,
+        RIGHT,
+        BOTTOM,
+        TOP,
+        NONE
     };
     enum class cell {
-        EMPTY, SNAKE, FOOD, TELEPORT
+        EMPTY,
+        SNAKE,
+        FOOD,
+        TELEPORT
     };
 
     bool not_opposite(direction, direction);
@@ -39,7 +46,6 @@ namespace snake {
         int x, y, time_created;
 
         food(int x_, int y_);
-
     };
 
 
@@ -52,7 +58,9 @@ namespace snake {
     public:
         static const int WIDTH = 30;
         static const int HEIGHT = 30;
-
+        static const int SNAKE_START_X_COORDINATE = WIDTH / 2;
+        static const int SNAKE_START_Y_COORDINATE = HEIGHT /2;
+        bool started = false;
         Game();
 
         bool &is_ended();
@@ -97,5 +105,5 @@ namespace snake {
         std::vector<snake_part> snake;
         std::list<food> all_food;
     };
-}//snake
-#endif //SNAKE_GAME_H
+}// namespace snake
+#endif//SNAKE_GAME_H
