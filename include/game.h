@@ -56,8 +56,8 @@ namespace snake {
         snake_part &get_block(int i);
 
     public:
-        static const int WIDTH = 30;
-        static const int HEIGHT = 30;
+        static const int WIDTH = 20;
+        static const int HEIGHT = 20;
         static const int SNAKE_START_X_COORDINATE = WIDTH / 2;
         static const int SNAKE_START_Y_COORDINATE = HEIGHT /2;
         bool started = false;

@@ -99,13 +99,15 @@ namespace snake {
     }
 
     void Game::create_food() {
-        while (true) {
-            int x_food = rand() % Game::WIDTH;
-            int y_food = rand() % Game::HEIGHT;
-            if (get_cell(x_food, y_food) == cell::EMPTY) {
-                set_cell(x_food, y_food, cell::FOOD);
-                all_food.emplace_back(x_food, y_food);
-                return;
+        if (snake_size + 1 <= Game::WIDTH * Game::HEIGHT) {
+            while (true) {
+                int x_food = rand() % Game::WIDTH;
+                int y_food = rand() % Game::HEIGHT;
+                if (get_cell(x_food, y_food) == cell::EMPTY) {
+                    set_cell(x_food, y_food, cell::FOOD);
+                    all_food.emplace_back(x_food, y_food);
+                    return;
+                }
             }
         }
     }
@@ -205,6 +207,10 @@ namespace snake {
     }
 
     bool Game::check_is_ended() {
+
+        if (snake_size == Game::WIDTH * Game::HEIGHT) {
+            is_ended() = true;
+        }
         if (is_ended()) {
             return is_ended();
         }
@@ -224,7 +230,7 @@ namespace snake {
     }
 
     void Game::create_teleport() {
-        if (!teleport_activated) {
+        if (!teleport_activated and snake_size + 2 + all_food.size() < Game::WIDTH * Game::HEIGHT) {
             while (true) {
                 int xin = rand() % Game::WIDTH;
                 int yin = rand() % Game::HEIGHT;
